@@ -23,44 +23,50 @@ check_command packer
 check_command aws
 check_command jq
 
+# Disable AWS CLI pager to avoid blocking interactive 'less' views
+export AWS_PAGER=""
+
 # Initialize variables
 export AWS_REGION="eu-west-1"
 export TF_VAR_aws_region=$AWS_REGION
-STATE_BUCKET_REGION="us-east-1"
+STATE_BUCKET_REGION="eu-west-1"
 
 # Create S3 bucket for Terraform state if it doesn't exist
 print_section "Setting up Terraform state bucket"
-BUCKET_NAME="three-tier-arch-aws-terraform"
+BUCKET_NAME="three-tier-arch-aws-terraform-eu-west-1"
 if ! aws s3api head-bucket --bucket $BUCKET_NAME 2>/dev/null; then
     echo "Creating S3 bucket for Terraform state..."
-    if [ "$STATE_BUCKET_REGION" = "us-east-1" ]; then
-        # us-east-1 doesn't support LocationConstraint
-        aws s3api create-bucket \
-            --bucket $BUCKET_NAME \
-            --region $STATE_BUCKET_REGION
-    else
-        aws s3api create-bucket \
-            --bucket $BUCKET_NAME \
-            --region $STATE_BUCKET_REGION \
-            --create-bucket-configuration LocationConstraint=$STATE_BUCKET_REGION
-    fi
+    aws s3api create-bucket \
+        --bucket $BUCKET_NAME \
+        --region $STATE_BUCKET_REGION \
+        --create-bucket-configuration LocationConstraint=$STATE_BUCKET_REGION
     aws s3api put-bucket-versioning \
         --bucket $BUCKET_NAME \
         --versioning-configuration Status=Enabled \
         --region $STATE_BUCKET_REGION
+else
+    BUCKET_REGION=$(aws s3api get-bucket-location --bucket $BUCKET_NAME --query 'LocationConstraint' --output text)
+    if [ "$BUCKET_REGION" = "None" ]; then
+        BUCKET_REGION="us-east-1"
+    fi
+    if [ "$BUCKET_REGION" != "$STATE_BUCKET_REGION" ]; then
+        echo "Error: Terraform state bucket '$BUCKET_NAME' exists in '$BUCKET_REGION' but this setup expects '$STATE_BUCKET_REGION'."
+        echo "Delete or rename the existing bucket, then rerun setup."
+        exit 1
+    fi
 fi
 
 # 1. Create VPC
 print_section "Creating VPC infrastructure"
 cd terraform/network
-terraform init
+terraform init -reconfigure
 terraform apply -auto-approve
 cd ../..
 
 # 2. Create RDS
 print_section "Creating RDS infrastructure"
 cd terraform/database
-terraform init
+terraform init -reconfigure
 terraform apply -auto-approve
 cd ../..
 
@@ -143,7 +149,7 @@ cd ../../..
 # 5. Create EC2 infrastructure
 print_section "Creating EC2 infrastructure"
 cd terraform/compute
-terraform init
+terraform init -reconfigure
 terraform apply -auto-approve
 cd ../..
 

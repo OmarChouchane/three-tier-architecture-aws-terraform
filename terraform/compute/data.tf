@@ -3,7 +3,7 @@ data "terraform_remote_state" "network" {
   config = {
     bucket = var.terraform_state_bucket
     key    = "network/terraform.tfstate"
-    region = var.aws_region
+    region = "eu-west-1"
   }
 }
 
@@ -13,7 +13,7 @@ data "terraform_remote_state" "database" {
   config = {
     bucket = var.terraform_state_bucket
     key    = "database/terraform.tfstate"
-    region = var.aws_region
+    region = "eu-west-1"
   }
 }
 

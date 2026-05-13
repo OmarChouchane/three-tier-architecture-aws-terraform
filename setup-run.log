@@ -1,0 +1,263 @@
++ set -e
++ check_command terraform
++ command -v terraform
++ check_command packer
++ command -v packer
++ check_command aws
++ command -v aws
++ check_command jq
++ command -v jq
++ export AWS_PAGER=
++ AWS_PAGER=
++ export AWS_REGION=eu-west-1
++ AWS_REGION=eu-west-1
++ export TF_VAR_aws_region=eu-west-1
++ TF_VAR_aws_region=eu-west-1
++ STATE_BUCKET_REGION=eu-west-1
++ print_section 'Setting up Terraform state bucket'
++ echo ================================================
+================================================
++ echo ' Setting up Terraform state bucket'
+ Setting up Terraform state bucket
++ echo ================================================
+================================================
++ BUCKET_NAME=three-tier-arch-aws-terraform-eu-west-1
++ aws s3api head-bucket --bucket three-tier-arch-aws-terraform-eu-west-1
+{
+    "BucketArn": "arn:aws:s3:::three-tier-arch-aws-terraform-eu-west-1",
+    "BucketRegion": "eu-west-1",
+    "AccessPointAlias": false
+}
+++ aws s3api get-bucket-location --bucket three-tier-arch-aws-terraform-eu-west-1 --query LocationConstraint --output text
++ BUCKET_REGION=eu-west-1
++ '[' eu-west-1 = None ']'
++ '[' eu-west-1 '!=' eu-west-1 ']'
++ print_section 'Creating VPC infrastructure'
++ echo ================================================
+================================================
++ echo ' Creating VPC infrastructure'
+ Creating VPC infrastructure
++ echo ================================================
+================================================
++ cd terraform/network
++ terraform init -reconfigure
+[0m[1mInitializing the backend...[0m
+[0m[32m
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.[0m
+[0m[1mInitializing provider plugins...[0m
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/aws v5.100.0
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
++ terraform apply -auto-approve
+[0m[1maws_eip.nat[0]: Refreshing state... [id=eipalloc-0ecacca17d195b210][0m
+[0m[1maws_vpc.main: Refreshing state... [id=vpc-03e543290f91b953d][0m
+[0m[1maws_eip.nat[1]: Refreshing state... [id=eipalloc-08c83c96baafbee61][0m
+[0m[1maws_eip.nat[2]: Refreshing state... [id=eipalloc-0d885cfb633d9dc70][0m
+[0m[1maws_subnet.web_private[0]: Refreshing state... [id=subnet-03e6ed049cefbd8bc][0m
+[0m[1maws_internet_gateway.main: Refreshing state... [id=igw-03f972eb9b3df9df3][0m
+[0m[1maws_subnet.web_private[2]: Refreshing state... [id=subnet-0d5016edde846da4e][0m
+[0m[1maws_subnet.web_private[1]: Refreshing state... [id=subnet-0ff4e24b609e830ed][0m
+[0m[1maws_subnet.web_public[0]: Refreshing state... [id=subnet-034fcffff03345006][0m
+[0m[1maws_subnet.web_public[2]: Refreshing state... [id=subnet-046163b21194e0d47][0m
+[0m[1maws_subnet.web_public[1]: Refreshing state... [id=subnet-0178a0c841fda6904][0m
+[0m[1maws_security_group.frontend_alb: Refreshing state... [id=sg-0adbf696ae62c4fb7][0m
+[0m[1maws_subnet.app_private[0]: Refreshing state... [id=subnet-02028d6b22c909e17][0m
+[0m[1maws_subnet.app_private[1]: Refreshing state... [id=subnet-057fc4db834a95f1c][0m
+[0m[1maws_subnet.app_private[2]: Refreshing state... [id=subnet-05718e37c836aceaa][0m
+[0m[1maws_subnet.database[1]: Refreshing state... [id=subnet-0e68e04f1e2f1c52b][0m
+[0m[1maws_subnet.database[0]: Refreshing state... [id=subnet-0868f6e29d787db5e][0m
+[0m[1maws_subnet.database[2]: Refreshing state... [id=subnet-0e3f027d67fefbd97][0m
+[0m[1maws_route_table.public: Refreshing state... [id=rtb-0a8bb40bfe4e5b347][0m
+[0m[1maws_security_group.frontend: Refreshing state... [id=sg-04cbe49667797ec0b][0m
+[0m[1maws_route_table_association.web_public[1]: Refreshing state... [id=rtbassoc-0313ae0b95cc19584][0m
+[0m[1maws_route_table_association.web_public[2]: Refreshing state... [id=rtbassoc-0267c7f0715ee847b][0m
+[0m[1maws_route_table_association.web_public[0]: Refreshing state... [id=rtbassoc-02a6d15889aea71dc][0m
+[0m[1maws_nat_gateway.main[1]: Refreshing state... [id=nat-0c00de7f2461dc7a1][0m
+[0m[1maws_nat_gateway.main[2]: Refreshing state... [id=nat-0db360d786528ac08][0m
+[0m[1maws_nat_gateway.main[0]: Refreshing state... [id=nat-0ba1e4676d9e5879e][0m
+[0m[1maws_route_table.web_private[0]: Refreshing state... [id=rtb-00b92f6e8f1927b43][0m
+[0m[1maws_route_table.database[2]: Refreshing state... [id=rtb-0a70dffb1b209ea56][0m
+[0m[1maws_route_table.web_private[2]: Refreshing state... [id=rtb-0438e8ad106978beb][0m
+[0m[1maws_route_table.database[0]: Refreshing state... [id=rtb-06a771a1e0788fd9a][0m
+[0m[1maws_route_table.web_private[1]: Refreshing state... [id=rtb-014aa9acda37a719b][0m
+[0m[1maws_route_table.database[1]: Refreshing state... [id=rtb-083b4936c90911400][0m
+[0m[1maws_route_table.app_private[1]: Refreshing state... [id=rtb-03d4f9c56276814ec][0m
+[0m[1maws_route_table.app_private[2]: Refreshing state... [id=rtb-02fbf2198d395dc01][0m
+[0m[1maws_route_table.app_private[0]: Refreshing state... [id=rtb-04744c2357a28a8dc][0m
+[0m[1maws_security_group.backend_alb: Refreshing state... [id=sg-04c25e8ec31b38674][0m
+[0m[1maws_route_table_association.database[2]: Refreshing state... [id=rtbassoc-04e20c7bb6392d5d6][0m
+[0m[1maws_route_table_association.database[0]: Refreshing state... [id=rtbassoc-0846387bac2d5b58c][0m
+[0m[1maws_route_table_association.database[1]: Refreshing state... [id=rtbassoc-04545aa9d75954bac][0m
+[0m[1maws_route_table_association.web_private[1]: Refreshing state... [id=rtbassoc-0d9df6cbce21e613a][0m
+[0m[1maws_route_table_association.web_private[0]: Refreshing state... [id=rtbassoc-012f21dea0b5c9856][0m
+[0m[1maws_route_table_association.web_private[2]: Refreshing state... [id=rtbassoc-0e5cd363fe2084435][0m
+[0m[1maws_route_table_association.app_private[0]: Refreshing state... [id=rtbassoc-0a14ad7c64afce52d][0m
+[0m[1maws_route_table_association.app_private[1]: Refreshing state... [id=rtbassoc-02042261a366f56e7][0m
+[0m[1maws_route_table_association.app_private[2]: Refreshing state... [id=rtbassoc-0ae437d723fa5ab95][0m
+[0m[1maws_security_group.backend: Refreshing state... [id=sg-0de3a803eee84e40e][0m
+[0m[1maws_security_group.rds: Refreshing state... [id=sg-085d27b57ca3e83e8][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+[0m[1m[32m
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mapp_private_route_table_ids = [
+  "rtb-04744c2357a28a8dc",
+  "rtb-03d4f9c56276814ec",
+  "rtb-02fbf2198d395dc01",
+]
+app_private_subnet_ids = [
+  "subnet-02028d6b22c909e17",
+  "subnet-057fc4db834a95f1c",
+  "subnet-05718e37c836aceaa",
+]
+backend_alb_sg_id = "sg-04c25e8ec31b38674"
+backend_sg_id = "sg-0de3a803eee84e40e"
+database_route_table_ids = [
+  "rtb-06a771a1e0788fd9a",
+  "rtb-083b4936c90911400",
+  "rtb-0a70dffb1b209ea56",
+]
+database_subnet_ids = [
+  "subnet-0868f6e29d787db5e",
+  "subnet-0e68e04f1e2f1c52b",
+  "subnet-0e3f027d67fefbd97",
+]
+frontend_alb_sg_id = "sg-0adbf696ae62c4fb7"
+frontend_sg_id = "sg-04cbe49667797ec0b"
+public_route_table_id = "rtb-0a8bb40bfe4e5b347"
+public_subnet_ids = [
+  "subnet-034fcffff03345006",
+  "subnet-0178a0c841fda6904",
+  "subnet-046163b21194e0d47",
+]
+rds_sg_id = "sg-085d27b57ca3e83e8"
+vpc_id = "vpc-03e543290f91b953d"
+web_private_route_table_ids = [
+  "rtb-00b92f6e8f1927b43",
+  "rtb-014aa9acda37a719b",
+  "rtb-0438e8ad106978beb",
+]
+web_private_subnet_ids = [
+  "subnet-03e6ed049cefbd8bc",
+  "subnet-0ff4e24b609e830ed",
+  "subnet-0d5016edde846da4e",
+]
++ cd ../..
++ print_section 'Creating RDS infrastructure'
++ echo ================================================
+================================================
++ echo ' Creating RDS infrastructure'
+ Creating RDS infrastructure
++ echo ================================================
+================================================
++ cd terraform/database
++ terraform init -reconfigure
+[0m[1mInitializing the backend...[0m
+[0m[32m
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.[0m
+[0m[1mInitializing provider plugins...[0m
+- terraform.io/builtin/terraform is built in to Terraform
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Using previously-installed hashicorp/aws v5.100.0
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
++ terraform apply -auto-approve
+[0m[1mdata.terraform_remote_state.network: Reading...[0m[0m
+[0m[1mdata.terraform_remote_state.network: Read complete after 1s[0m
+[0m[1maws_db_subnet_group.main: Refreshing state... [id=three-tier-app-subnet-group][0m
+[0m[1maws_db_instance.main: Refreshing state... [id=db-LU62KH3DBAADIHR3L2NY2KYUMU][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+[0m[1m[32m
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mrds_address = "three-tier-app-db.cvwq84a409lp.eu-west-1.rds.amazonaws.com"
+rds_endpoint = "three-tier-app-db.cvwq84a409lp.eu-west-1.rds.amazonaws.com:3306"
+rds_password = <sensitive>
+rds_security_group_id = "sg-085d27b57ca3e83e8"
+rds_username = "admin"
++ cd ../..
++ print_section 'Creating AMIs'
++ echo ================================================
+================================================
++ echo ' Creating AMIs'
+ Creating AMIs
++ echo ================================================
+================================================
++ print_section 'Creating Frontend AMI'
++ echo ================================================
+================================================
++ echo ' Creating Frontend AMI'
+ Creating Frontend AMI
++ echo ================================================
+================================================
++ FRONTEND_AMI_ID=
++ '[' -f terraform/compute/ami_ids/frontend_ami.txt ']'
+++ cat terraform/compute/ami_ids/frontend_ami.txt
++ FRONTEND_AMI_ID=ami-085b4a89c5bec81e8
++ check_ami_exists ami-085b4a89c5bec81e8
++ local ami_id=ami-085b4a89c5bec81e8
++ '[' '!' -z ami-085b4a89c5bec81e8 ']'
++ aws ec2 describe-images --image-ids ami-085b4a89c5bec81e8 --query 'Images[0].State' --output text
++ grep -q available
++ return 0
++ echo 'Frontend AMI ami-085b4a89c5bec81e8 already exists and is available'
+Frontend AMI ami-085b4a89c5bec81e8 already exists and is available
++ print_section 'Creating Backend AMI'
++ echo ================================================
+================================================
++ echo ' Creating Backend AMI'
+ Creating Backend AMI
++ echo ================================================
+================================================
++ BACKEND_AMI_ID=
++ '[' -f terraform/compute/ami_ids/backend_ami.txt ']'
+++ cat terraform/compute/ami_ids/backend_ami.txt
++ BACKEND_AMI_ID=ami-0f303b27eb4b8ba26
++ check_ami_exists ami-0f303b27eb4b8ba26
++ local ami_id=ami-0f303b27eb4b8ba26
++ '[' '!' -z ami-0f303b27eb4b8ba26 ']'
++ aws ec2 describe-images --image-ids ami-0f303b27eb4b8ba26 --query 'Images[0].State' --output text
++ grep -q available
++ return 0
++ echo 'Backend AMI ami-0f303b27eb4b8ba26 already exists and is available'
+Backend AMI ami-0f303b27eb4b8ba26 already exists and is available
++ print_section 'Generating SSH keys'
++ echo ================================================
+================================================
++ echo ' Generating SSH keys'
+ Generating SSH keys
++ echo ================================================
+================================================
++ cd terraform/compute/keys
+./setup.sh: line 121: cd: terraform/compute/keys: No such file or directory
