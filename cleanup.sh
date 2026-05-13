@@ -25,6 +25,7 @@ check_command jq
 # Initialize variables
 export AWS_REGION="eu-west-1"
 export TF_VAR_aws_region=$AWS_REGION
+BUCKET_NAME="three-tier-arch-aws-terraform-eu-west-1"
 
 # 1. Clean up EC2 infrastructure
 print_section "Destroying EC2 infrastructure"
@@ -50,14 +51,14 @@ fi
 # Deregister AMIs if they exist
 if [ ! -z "$FRONTEND_AMI_ID" ]; then
     echo "Deregistering Frontend AMI: $FRONTEND_AMI_ID"
-    aws ec2 deregister-image --image-id $FRONTEND_AMI_ID
+    aws ec2 deregister-image --image-id $FRONTEND_AMI_ID --region $AWS_REGION || echo "Warning: Failed to deregister Frontend AMI (may already be deleted)"
 else
     echo "No Frontend AMI ID found, skipping deregistration"
 fi
 
 if [ ! -z "$BACKEND_AMI_ID" ]; then
     echo "Deregistering Backend AMI: $BACKEND_AMI_ID"
-    aws ec2 deregister-image --image-id $BACKEND_AMI_ID
+    aws ec2 deregister-image --image-id $BACKEND_AMI_ID --region $AWS_REGION || echo "Warning: Failed to deregister Backend AMI (may already be deleted)"
 else
     echo "No Backend AMI ID found, skipping deregistration"
 fi
